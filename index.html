@@ -1,8 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>WASM计算器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="WASM计算器 - 使用WebAssembly技术构建的高性能在线计算器应用">
+    <meta name="keywords" content="计算器, WASM, WebAssembly, Rust, 在线工具">
+    <meta name="author" content="WASM计算器">
+    <meta property="og:title" content="WASM计算器 - 高性能在线计算工具">
+    <meta property="og:description" content="使用WebAssembly技术构建的高性能在线计算器应用">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="WASM计算器 - 高性能在线计算工具">
+    <meta name="twitter:description" content="使用WebAssembly技术构建的高性能在线计算器应用">
+    <title>WASM计算器 - 高性能在线计算工具</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -10,50 +20,79 @@
         }
         .calculator-button {
             transition: all 0.1s ease;
+            -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
         }
         .calculator-button:active {
             transform: scale(0.95);
             opacity: 0.8;
         }
+        /* 移动端优化 */
+        @media (max-width: 640px) {
+            .calculator-container {
+                width: 95%;
+                max-width: 400px;
+            }
+            .calculator-button {
+                height: 4rem; /* 移动端按钮更大 */
+            }
+        }
+        /* 防止iOS缩放 */
+        input, button {
+            font-size: 16px;
+        }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="bg-black p-6 rounded-3xl shadow-xl w-full max-w-xs">
-        <!-- 显示结果的地方 -->
-        <div class="mb-6 flex justify-end items-center h-24 overflow-hidden">
-            <p id="display" class="text-4xl text-white font-light tracking-wider pr-2">0</p>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-black text-amber-400 w-full py-3 px-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl sm:text-2xl font-bold">WASM <span class="text-amber-500">计算器</span></h1>
+            <div>
+                <a href="https://www.chuhai.tools/" class="text-amber-400 hover:text-amber-300 mx-2 transition-colors text-base sm:text-lg font-medium" target="_blank" rel="noopener noreferrer">出海工具站</a> | 
+                <a href="https://xiaobaot.best/" class="text-amber-400 hover:text-amber-300 mx-2 transition-colors text-base sm:text-lg font-medium" target="_blank" rel="noopener noreferrer">小报童甄选</a>
+            </div>
         </div>
-        
-        <!-- 计算器按钮 -->
-        <div class="grid grid-cols-4 gap-3">
-            <!-- 第一行 -->
-            <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-16 flex items-center justify-center text-xl" data-action="clear">C</button>
-            <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-16 flex items-center justify-center text-xl" data-action="plusminus">+/-</button>
-            <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-16 flex items-center justify-center text-xl" data-action="percent">%</button>
-            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-operator="/">÷</button>
+    </nav>
+    
+    <!-- 计算器主体 -->
+    <div class="flex-grow flex flex-col items-center justify-center py-8 px-4">
+        <div class="bg-black p-5 sm:p-6 rounded-3xl shadow-xl w-full max-w-xs calculator-container">
+            <!-- 显示结果的地方 -->
+            <div class="mb-5 sm:mb-6 flex justify-end items-center h-20 sm:h-24 overflow-hidden">
+                <p id="display" class="text-3xl sm:text-4xl text-white font-light tracking-wider pr-2 break-all">0</p>
+            </div>
             
-            <!-- 第二行 -->
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="7">7</button>
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="8">8</button>
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="9">9</button>
-            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-operator="*">×</button>
-            
-            <!-- 第三行 -->
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="4">4</button>
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="5">5</button>
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="6">6</button>
-            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-operator="-">−</button>
-            
-            <!-- 第四行 -->
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="1">1</button>
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="2">2</button>
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="3">3</button>
-            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-operator="+">+</button>
-            
-            <!-- 第五行 -->
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 col-span-2 flex items-center justify-center text-xl" data-number="0">0</button>
-            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number=".">.</button>
-            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-action="equals">=</button>
+            <!-- 计算器按钮 -->
+            <div class="grid grid-cols-4 gap-2 sm:gap-3">
+                <!-- 第一行 -->
+                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="clear">C</button>
+                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="plusminus">+/-</button>
+                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="percent">%</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="/">÷</button>
+                
+                <!-- 第二行 -->
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="7">7</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="8">8</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="9">9</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="*">×</button>
+                
+                <!-- 第三行 -->
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="4">4</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="5">5</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="6">6</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="-">−</button>
+                
+                <!-- 第四行 -->
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="1">1</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="2">2</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="3">3</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="+">+</button>
+                
+                <!-- 第五行 -->
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 col-span-2 flex items-center justify-center text-xl" data-number="0">0</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number=".">.</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="equals">=</button>
+            </div>
         </div>
     </div>
 
@@ -159,6 +198,15 @@
                 }
                 
                 display.textContent = displayValue;
+                
+                // 动态调整字体大小
+                if (displayValue.length > 8) {
+                    display.classList.remove('text-3xl', 'sm:text-4xl');
+                    display.classList.add('text-2xl', 'sm:text-3xl');
+                } else {
+                    display.classList.remove('text-2xl', 'sm:text-3xl');
+                    display.classList.add('text-3xl', 'sm:text-4xl');
+                }
             }
             
             // 计算结果
