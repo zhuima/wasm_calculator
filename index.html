@@ -3,16 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="WASM计算器 - 使用WebAssembly技术构建的高性能在线计算器应用">
-    <meta name="keywords" content="计算器, WASM, WebAssembly, Rust, 在线工具">
+    <meta name="description" content="WASM计算器 - 使用WebAssembly和Rust技术构建的高性能在线计算器应用，支持基础运算、百分比计算，界面美观，运行速度快，是您日常计算的理想选择。">
+    <meta name="keywords" content="计算器, WASM, WebAssembly, Rust, 在线工具, 高性能计算器, 在线计算器">
     <meta name="author" content="WASM计算器">
-    <meta property="og:title" content="WASM计算器 - 高性能在线计算工具">
-    <meta property="og:description" content="使用WebAssembly技术构建的高性能在线计算器应用">
+    <meta property="og:title" content="WASM计算器 - 高性能在线计算工具 | 使用WebAssembly技术">
+    <meta property="og:description" content="使用WebAssembly技术构建的高性能在线计算器应用，支持各种基础运算，界面美观，速度快捷。">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wasm-calculator.chuhai.tools/">
+    <meta property="og:image" content="https://wasm-calculator.chuhai.tools/og_image.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="WASM计算器 - 高性能在线计算工具">
-    <meta name="twitter:description" content="使用WebAssembly技术构建的高性能在线计算器应用">
-    <title>WASM计算器 - 高性能在线计算工具</title>
+    <meta name="twitter:site" content="WASM计算器 - 高性能在线计算工具 | 使用WebAssembly技术">
+    <meta name="twitter:title" content="WASM计算器 - 高性能在线计算工具 | 使用WebAssembly技术">
+    <meta name="twitter:description" content="使用WebAssembly技术构建的高性能在线计算器应用，支持各种基础运算，界面美观，速度快捷。">
+    <meta name="twitter:image" content="https://wasm-calculator.chuhai.tools/og_image.png">
+    <title>WASM计算器 - 使用WebAssembly构建的高性能在线计算工具 | 简洁易用</title>
+    <link rel="canonical" href="https://wasm-calculator.chuhai.tools/">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="robots" content="index, follow">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -41,6 +52,35 @@
             font-size: 16px;
         }
     </style>
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "WASM计算器",
+        "description": "使用WebAssembly技术构建的高性能在线计算器应用",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "CNY"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "出海工具站",
+            "url": "https://www.chuhai.tools/"
+        }
+    }
+    </script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- 顶部导航栏 -->
@@ -55,7 +95,7 @@
     </nav>
     
     <!-- 计算器主体 -->
-    <div class="flex-grow flex flex-col items-center justify-center py-8 px-4">
+    <main class="flex-grow flex flex-col items-center justify-center py-8 px-4">
         <div class="bg-black p-5 sm:p-6 rounded-3xl shadow-xl w-full max-w-xs calculator-container">
             <!-- 显示结果的地方 -->
             <div class="mb-5 sm:mb-6 flex justify-end items-center h-20 sm:h-24 overflow-hidden">
@@ -65,36 +105,66 @@
             <!-- 计算器按钮 -->
             <div class="grid grid-cols-4 gap-2 sm:gap-3">
                 <!-- 第一行 -->
-                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="clear">C</button>
-                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="plusminus">+/-</button>
-                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="percent">%</button>
-                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="/">÷</button>
+                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="clear" aria-label="清除">C</button>
+                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="plusminus" aria-label="正负号">+/-</button>
+                <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="percent" aria-label="百分比">%</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="/" aria-label="除法">÷</button>
                 
                 <!-- 第二行 -->
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="7">7</button>
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="8">8</button>
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="9">9</button>
-                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="*">×</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="7" aria-label="数字7">7</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="8" aria-label="数字8">8</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="9" aria-label="数字9">9</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="*" aria-label="乘法">×</button>
                 
                 <!-- 第三行 -->
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="4">4</button>
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="5">5</button>
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="6">6</button>
-                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="-">−</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="4" aria-label="数字4">4</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="5" aria-label="数字5">5</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="6" aria-label="数字6">6</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="-" aria-label="减法">−</button>
                 
                 <!-- 第四行 -->
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="1">1</button>
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="2">2</button>
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="3">3</button>
-                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="+">+</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="1" aria-label="数字1">1</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="2" aria-label="数字2">2</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="3" aria-label="数字3">3</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-operator="+" aria-label="加法">+</button>
                 
                 <!-- 第五行 -->
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 col-span-2 flex items-center justify-center text-xl" data-number="0">0</button>
-                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number=".">.</button>
-                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="equals">=</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 col-span-2 flex items-center justify-center text-xl" data-number="0" aria-label="数字0">0</button>
+                <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-number="." aria-label="小数点">.</button>
+                <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-14 sm:h-16 flex items-center justify-center text-xl" data-action="equals" aria-label="等于">=</button>
             </div>
         </div>
-    </div>
+        
+        <!-- 添加H2和H3标签改善SEO -->
+        <!-- <section class="mt-8 text-center max-w-md px-4">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">WebAssembly高性能计算</h2>
+            <p class="text-gray-600 mb-4">本计算器使用Rust编写，通过WebAssembly技术编译，实现接近原生应用的高性能计算体验。</p>
+            
+            <h3 class="text-lg font-bold text-gray-800 mb-2">支持的功能</h3>
+            <ul class="text-gray-600 text-sm list-disc list-inside mb-4">
+                <li>基础四则运算</li>
+                <li>百分比计算</li>
+                <li>正负数转换</li>
+                <li>小数点计算</li>
+            </ul>
+            
+            <h3 class="text-lg font-bold text-gray-800 mb-2">技术特点</h3>
+            <p class="text-gray-600 mb-4">
+                采用Rust语言开发核心计算逻辑，通过WebAssembly编译为高性能网页应用。相比传统JavaScript计算器，性能提升显著，特别是在复杂计算场景下。
+            </p>
+        </section> -->
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-black text-amber-400 py-4 px-4 mt-auto">
+        <div class="container mx-auto text-center text-sm">
+            <p>© 2025 WASM计算器 - 基于WebAssembly技术</p>
+            <p class="mt-2">
+                <a href="/robots.txt" class="text-amber-400 hover:text-amber-300 mx-2">Robots.txt</a> | 
+                <a href="/sitemap.xml" class="text-amber-400 hover:text-amber-300 mx-2">Sitemap</a>
+            </p>
+        </div>
+    </footer>
 
     <!-- JavaScript代码 -->
     <script type="module">

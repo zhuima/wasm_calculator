@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wasm-calculator.chuhai.tools/sitemap.xml 
