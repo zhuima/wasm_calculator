@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WASM计算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .calculator-button {
+            transition: all 0.1s ease;
+        }
+        .calculator-button:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-black p-6 rounded-3xl shadow-xl w-full max-w-xs">
+        <!-- 显示结果的地方 -->
+        <div class="mb-6 flex justify-end items-center h-24 overflow-hidden">
+            <p id="display" class="text-4xl text-white font-light tracking-wider pr-2">0</p>
+        </div>
+        
+        <!-- 计算器按钮 -->
+        <div class="grid grid-cols-4 gap-3">
+            <!-- 第一行 -->
+            <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-16 flex items-center justify-center text-xl" data-action="clear">C</button>
+            <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-16 flex items-center justify-center text-xl" data-action="plusminus">+/-</button>
+            <button class="calculator-button bg-gray-400 text-black font-medium rounded-full h-16 flex items-center justify-center text-xl" data-action="percent">%</button>
+            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-operator="/">÷</button>
+            
+            <!-- 第二行 -->
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="7">7</button>
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="8">8</button>
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="9">9</button>
+            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-operator="*">×</button>
+            
+            <!-- 第三行 -->
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="4">4</button>
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="5">5</button>
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="6">6</button>
+            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-operator="-">−</button>
+            
+            <!-- 第四行 -->
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="1">1</button>
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="2">2</button>
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number="3">3</button>
+            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-operator="+">+</button>
+            
+            <!-- 第五行 -->
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 col-span-2 flex items-center justify-center text-xl" data-number="0">0</button>
+            <button class="calculator-button bg-gray-700 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-number=".">.</button>
+            <button class="calculator-button bg-amber-500 text-white font-medium rounded-full h-16 flex items-center justify-center text-xl" data-action="equals">=</button>
+        </div>
+    </div>
+
+    <!-- JavaScript代码 -->
+    <script type="module">
+        // 导入WASM模块和calculate函数
+        import init, { calculate } from './pkg/wasm_calculator.js';
+
+        // 启动函数
+        async function run() {
+            await init();  // 初始化WASM模块
+            
+            let currentInput = '';
+            let currentOperation = null;
+            let previousInput = '';
+            let shouldResetDisplay = false;
+            
+            const display = document.getElementById('display');
+            
+            // 数字按钮点击处理
+            document.querySelectorAll('[data-number]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const value = button.getAttribute('data-number');
+                    
+                    if (shouldResetDisplay) {
+                        currentInput = '';
+                        shouldResetDisplay = false;
+                    }
+                    
+                    // 处理小数点
+                    if (value === '.' && currentInput.includes('.')) {
+                        return;
+                    }
+                    
+                    // 处理0开头的情况
+                    if (currentInput === '0' && value !== '.') {
+                        currentInput = value;
+                    } else {
+                        currentInput += value;
+                    }
+                    
+                    updateDisplay();
+                });
+            });
+            
+            // 操作符按钮点击处理
+            document.querySelectorAll('[data-operator]').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (currentInput === '') return;
+                    
+                    if (previousInput !== '') {
+                        calculate();
+                    }
+                    
+                    previousInput = currentInput;
+                    currentOperation = button.getAttribute('data-operator');
+                    shouldResetDisplay = true;
+                });
+            });
+            
+            // 功能按钮点击处理
+            document.querySelectorAll('[data-action]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const action = button.getAttribute('data-action');
+                    
+                    switch (action) {
+                        case 'clear':
+                            currentInput = '0';
+                            previousInput = '';
+                            currentOperation = null;
+                            updateDisplay();
+                            break;
+                        case 'equals':
+                            if (currentInput === '' || previousInput === '' || !currentOperation) return;
+                            calculateResult();
+                            break;
+                        case 'plusminus':
+                            currentInput = (parseFloat(currentInput) * -1).toString();
+                            updateDisplay();
+                            break;
+                        case 'percent':
+                            currentInput = (parseFloat(currentInput) / 100).toString();
+                            updateDisplay();
+                            break;
+                    }
+                });
+            });
+            
+            // 更新显示
+            function updateDisplay() {
+                // 格式化数字，处理大数和小数
+                let displayValue = currentInput;
+                if (displayValue === '') displayValue = '0';
+                
+                // 限制长度
+                if (displayValue.length > 10) {
+                    const num = parseFloat(displayValue);
+                    if (Math.abs(num) >= 1e10) {
+                        displayValue = num.toExponential(6);
+                    } else {
+                        displayValue = displayValue.substring(0, 10);
+                    }
+                }
+                
+                display.textContent = displayValue;
+            }
+            
+            // 计算结果
+            function calculateResult() {
+                try {
+                    // 构建表达式
+                    const expression = `${previousInput} ${currentOperation} ${currentInput}`;
+                    // 调用Rust的calculate函数
+                    const result = calculate(expression);
+                    currentInput = result.toString();
+                    previousInput = '';
+                    currentOperation = null;
+                    updateDisplay();
+                    shouldResetDisplay = true;
+                } catch (error) {
+                    display.textContent = 'Error';
+                    currentInput = '';
+                    previousInput = '';
+                    currentOperation = null;
+                    shouldResetDisplay = true;
+                }
+            }
+            
+            // 初始化显示
+            updateDisplay();
+        }
+
+        run();  // 运行启动函数
+    </script>
+</body>
+</html>
